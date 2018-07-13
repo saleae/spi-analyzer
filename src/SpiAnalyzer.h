@@ -6,7 +6,7 @@
 #include "SpiSimulationDataGenerator.h"
 
 class SpiAnalyzerSettings;
-class ANALYZER_EXPORT SpiAnalyzer : public Analyzer2
+class SpiAnalyzer : public Analyzer2
 {
 public:
 	SpiAnalyzer();

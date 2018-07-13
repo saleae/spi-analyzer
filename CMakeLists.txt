@@ -17,13 +17,4 @@ src/SpiSimulationDataGenerator.cpp
 src/SpiSimulationDataGenerator.h
 )
 
-add_library(spi_analyzer SHARED ${SOURCES})
-target_link_libraries(spi_analyzer PRIVATE Saleae::AnalyzerSDK)
-
-if(MSVC)
-    install(TARGETS spi_analyzer RUNTIME DESTINATION "Analyzers")
-else()
-    install(TARGETS spi_analyzer LIBRARY DESTINATION "Analyzers")
-endif()
-
-set_post_build_destination(spi_analyzer)
+add_analyzer_plugin(spi_analyzer SOURCES ${SOURCES})
