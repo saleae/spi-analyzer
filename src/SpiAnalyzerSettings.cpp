@@ -35,13 +35,13 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mEnableChannelInterface->SetSelectionOfNoneIsAllowed( true );
 
 	mShiftOrderInterface.reset( new AnalyzerSettingInterfaceNumberList() );
-	mShiftOrderInterface->SetTitleAndTooltip( "", "" );
-	mShiftOrderInterface->AddNumber( AnalyzerEnums::MsbFirst, "Most Significant Bit First (Standard)", "" );
+	mShiftOrderInterface->SetTitleAndTooltip( "Significant Bit", "" );
+	mShiftOrderInterface->AddNumber( AnalyzerEnums::MsbFirst, "Most Significant Bit First (Standard)", "Select if the most significant bit or least significant bit is transmitted first" );
 	mShiftOrderInterface->AddNumber( AnalyzerEnums::LsbFirst, "Least Significant Bit First", "" );
 	mShiftOrderInterface->SetNumber( mShiftOrder );
 
 	mBitsPerTransferInterface.reset( new AnalyzerSettingInterfaceNumberList() );
-	mBitsPerTransferInterface->SetTitleAndTooltip( "", "" );
+	mBitsPerTransferInterface->SetTitleAndTooltip( "Bits per Transfer", "" );
 	for( U32 i=1; i<=64; i++ )
 	{
 		std::stringstream ss;
@@ -56,19 +56,19 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mBitsPerTransferInterface->SetNumber( mBitsPerTransfer );
 
 	mClockInactiveStateInterface.reset( new AnalyzerSettingInterfaceNumberList() );
-	mClockInactiveStateInterface->SetTitleAndTooltip( "", "" );
+	mClockInactiveStateInterface->SetTitleAndTooltip( "Clock State", "" );
 	mClockInactiveStateInterface->AddNumber( BIT_LOW, "Clock is Low when inactive (CPOL = 0)", "CPOL = 0 (Clock Polarity)" );
 	mClockInactiveStateInterface->AddNumber( BIT_HIGH, "Clock is High when inactive (CPOL = 1)", "CPOL = 1 (Clock Polarity)" );
 	mClockInactiveStateInterface->SetNumber( mClockInactiveState );
 
 	mDataValidEdgeInterface.reset( new AnalyzerSettingInterfaceNumberList() );
-	mDataValidEdgeInterface->SetTitleAndTooltip( "", "" );
+	mDataValidEdgeInterface->SetTitleAndTooltip( "Clock Phase", "" );
 	mDataValidEdgeInterface->AddNumber( AnalyzerEnums::LeadingEdge, "Data is Valid on Clock Leading Edge (CPHA = 0)", "CPHA = 0 (Clock Phase)" );
 	mDataValidEdgeInterface->AddNumber( AnalyzerEnums::TrailingEdge, "Data is Valid on Clock Trailing Edge (CPHA = 1)", "CPHA = 1 (Clock Phase)" );
 	mDataValidEdgeInterface->SetNumber( mDataValidEdge );
 
 	mEnableActiveStateInterface.reset( new AnalyzerSettingInterfaceNumberList() );
-	mEnableActiveStateInterface->SetTitleAndTooltip( "", "" );
+	mEnableActiveStateInterface->SetTitleAndTooltip( "Enable Line", "" );
 	mEnableActiveStateInterface->AddNumber( BIT_LOW, "Enable line is Active Low (Standard)", "" );
 	mEnableActiveStateInterface->AddNumber( BIT_HIGH, "Enable line is Active High", "" );
 	mEnableActiveStateInterface->SetNumber( mEnableActiveState );
