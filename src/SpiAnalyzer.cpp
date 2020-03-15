@@ -116,7 +116,7 @@ void SpiAnalyzer::AdvanceToActiveEnableEdge()
 			mEnable->AdvanceToNextEdge();
 		}
 		mCurrentSample = mEnable->GetSampleNumber();
-		mClock->AdvanceToAbsPosition( mCurrentSample );
+		mClock->AdvanceToAbsPosition( mCurrentSample -1 );
 	}else
 	{
 		mCurrentSample = mClock->GetSampleNumber();
