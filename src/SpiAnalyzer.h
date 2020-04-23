@@ -44,6 +44,9 @@ protected:  //vars
 	U64 mCurrentSample;
 	AnalyzerResults::MarkerType mArrowMarker;
 	std::vector<U64> mArrowLocations;
+	DataBuilder mMosiResult;
+	DataBuilder mMisoResult;
+
 
 #pragma warning( pop )
 };

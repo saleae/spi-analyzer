@@ -185,13 +185,11 @@ void SpiAnalyzer::GetWord()
 
     U32 bits_per_transfer = mSettings->mBitsPerTransfer;
 
-    DataBuilder mosi_result;
     U64 mosi_word = 0;
-    mosi_result.Reset( &mosi_word, mSettings->mShiftOrder, bits_per_transfer );
+    mMosiResult.Reset( &mosi_word, mSettings->mShiftOrder, bits_per_transfer );
 
-    DataBuilder miso_result;
     U64 miso_word = 0;
-    miso_result.Reset( &miso_word, mSettings->mShiftOrder, bits_per_transfer );
+    mMisoResult.Reset( &miso_word, mSettings->mShiftOrder, bits_per_transfer );
 
     U64 first_sample = 0;
     bool need_reset = false;
@@ -223,12 +221,12 @@ void SpiAnalyzer::GetWord()
             if( mMosi != NULL )
             {
                 mMosi->AdvanceToAbsPosition( mCurrentSample );
-                mosi_result.AddBit( mMosi->GetBitState() );
+                mMosiResult.AddBit( mMosi->GetBitState() );
             }
             if( mMiso != NULL )
             {
                 mMiso->AdvanceToAbsPosition( mCurrentSample );
-                miso_result.AddBit( mMiso->GetBitState() );
+                mMisoResult.AddBit( mMiso->GetBitState() );
             }
             mArrowLocations.push_back( mCurrentSample );
         }
@@ -268,12 +266,12 @@ void SpiAnalyzer::GetWord()
             if( mMosi != NULL )
             {
                 mMosi->AdvanceToAbsPosition( mCurrentSample );
-                mosi_result.AddBit( mMosi->GetBitState() );
+                mMosiResult.AddBit( mMosi->GetBitState() );
             }
             if( mMiso != NULL )
             {
                 mMiso->AdvanceToAbsPosition( mCurrentSample );
-                miso_result.AddBit( mMiso->GetBitState() );
+                mMisoResult.AddBit( mMiso->GetBitState() );
             }
             mArrowLocations.push_back( mCurrentSample );
         }
