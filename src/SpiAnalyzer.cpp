@@ -291,8 +291,13 @@ void SpiAnalyzer::GetWord()
     mResults->AddFrame( result_frame );
 
     FrameV2 framev2;
-    framev2.AddInteger( "mosi", mosi_word );
-    framev2.AddInteger( "miso", miso_word );
+    if (bits_per_transfer <= 8) {
+        framev2.AddByte("mosi", static_cast<U8>(mosi_word));
+        framev2.AddByte("miso", static_cast<U8>(miso_word));
+    } else {
+        framev2.AddInteger( "mosi", mosi_word );
+        framev2.AddInteger( "miso", miso_word );
+    }
     mResults->AddFrameV2( framev2, "result", first_sample, mClock->GetSampleNumber() + 1 );
 
     mResults->CommitResults();
