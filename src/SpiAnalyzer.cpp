@@ -183,7 +183,8 @@ void SpiAnalyzer::GetWord()
 {
     // we're assuming we come into this function with the clock in the idle state;
 
-    U32 bits_per_transfer = mSettings->mBitsPerTransfer;
+    const U32 bits_per_transfer = mSettings->mBitsPerTransfer;
+    const U32 bytes_per_transfer = ( bits_per_transfer + 7 ) / 8;
 
     U64 mosi_word = 0;
     mMosiResult.Reset( &mosi_word, mSettings->mShiftOrder, bits_per_transfer );
@@ -291,13 +292,19 @@ void SpiAnalyzer::GetWord()
     mResults->AddFrame( result_frame );
 
     FrameV2 framev2;
-    if (bits_per_transfer <= 8) {
-        framev2.AddByte("mosi", static_cast<U8>(mosi_word));
-        framev2.AddByte("miso", static_cast<U8>(miso_word));
-    } else {
-        framev2.AddInteger( "mosi", mosi_word );
-        framev2.AddInteger( "miso", miso_word );
+
+    // Max bits per transfer == 64, max bytes == 8
+    U8 mosi_bytearray[ 8 ];
+    U8 miso_bytearray[ 8 ];
+    for( int i = 0; i < bytes_per_transfer; ++i )
+    {
+        auto bit_offset = ( bytes_per_transfer - i - 1 ) * 8;
+        mosi_bytearray[ i ] = mosi_word >> bit_offset;
+        miso_bytearray[ i ] = miso_word >> bit_offset;
     }
+    framev2.AddByteArray( "mosi", mosi_bytearray, bytes_per_transfer );
+    framev2.AddByteArray( "miso", miso_bytearray, bytes_per_transfer );
+
     mResults->AddFrameV2( framev2, "result", first_sample, mClock->GetSampleNumber() + 1 );
 
     mResults->CommitResults();
