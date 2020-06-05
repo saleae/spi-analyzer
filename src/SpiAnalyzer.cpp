@@ -62,7 +62,7 @@ void SpiAnalyzer::AdvanceToActiveEnableEdgeWithCorrectClockPolarity()
             if( mEnable )
             {
                 FrameV2 frame_v2_start_of_transaction;
-                mResults->AddFrameV2( frame_v2_start_of_transaction, "Enable", mCurrentSample, mCurrentSample + 1 );
+                mResults->AddFrameV2( frame_v2_start_of_transaction, "enable", mCurrentSample, mCurrentSample + 1 );
             }
             break;
         }
