@@ -184,7 +184,7 @@ bool SpiAnalyzer::WouldAdvancingTheClockToggleEnable()
     {
         U64 enable_edge = mEnable->GetSampleOfNextEdge();
         FrameV2 frame_v2_end_of_transaction;
-        mResults->AddFrameV2( frame_v2_end_of_transaction, "Disable", enable_edge, enable_edge + 1 );
+        mResults->AddFrameV2( frame_v2_end_of_transaction, "disable", enable_edge, enable_edge + 1 );
     }
 
     if( enable_will_toggle == false )
