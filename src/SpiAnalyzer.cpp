@@ -58,7 +58,14 @@ void SpiAnalyzer::AdvanceToActiveEnableEdgeWithCorrectClockPolarity()
     for( ;; )
     {
         if( IsInitialClockPolarityCorrect() == true ) // if false, this function moves to the next active enable edge.
+        {
+            if( mEnable )
+            {
+                FrameV2 frame_v2_start_of_transaction;
+                mResults->AddFrameV2( frame_v2_start_of_transaction, "Enable", mCurrentSample, mCurrentSample + 1 );
+            }
             break;
+        }
     }
 }
 
@@ -173,6 +180,13 @@ bool SpiAnalyzer::WouldAdvancingTheClockToggleEnable()
     U64 next_edge = mClock->GetSampleOfNextEdge();
     bool enable_will_toggle = mEnable->WouldAdvancingToAbsPositionCauseTransition( next_edge );
 
+    if( enable_will_toggle )
+    {
+        U64 enable_edge = mEnable->GetSampleOfNextEdge();
+        FrameV2 frame_v2_end_of_transaction;
+        mResults->AddFrameV2( frame_v2_end_of_transaction, "Disable", enable_edge, enable_edge + 1 );
+    }
+
     if( enable_will_toggle == false )
         return false;
     else
@@ -278,7 +292,7 @@ void SpiAnalyzer::GetWord()
         }
     }
 
-    // save the resuls:
+    // save the results:
     U32 count = mArrowLocations.size();
     for( U32 i = 0; i < count; i++ )
         mResults->AddMarker( mArrowLocations[ i ], mArrowMarker, mSettings->mClockChannel );
