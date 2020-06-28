@@ -67,19 +67,27 @@ void SpiAnalyzer::Setup()
 	if( mSettings->mDataValidEdge == AnalyzerEnums::LeadingEdge )
 		allow_last_trailing_clock_edge_to_fall_outside_enable = true;
 
-	if( mSettings->mClockInactiveState == BIT_LOW )
+	if (mSettings->mSampleAtMiddle == SpiAnalyzerSettings::SAMPLE_MIDDLE)
 	{
-		if( mSettings->mDataValidEdge == AnalyzerEnums::LeadingEdge )
-			mArrowMarker = AnalyzerResults::UpArrow;
-		else
-			mArrowMarker = AnalyzerResults::DownArrow;
+		mArrowMarker = AnalyzerResults::Dot;
+	}
+	else
+	{
+		if (mSettings->mClockInactiveState == BIT_LOW)
+		{
+			if (mSettings->mDataValidEdge == AnalyzerEnums::LeadingEdge)
+				mArrowMarker = AnalyzerResults::UpArrow;
+			else
+				mArrowMarker = AnalyzerResults::DownArrow;
 
-	}else
-	{
-		if( mSettings->mDataValidEdge == AnalyzerEnums::LeadingEdge )
-			mArrowMarker = AnalyzerResults::DownArrow;
+		}
 		else
-			mArrowMarker = AnalyzerResults::UpArrow;
+		{
+			if (mSettings->mDataValidEdge == AnalyzerEnums::LeadingEdge)
+				mArrowMarker = AnalyzerResults::DownArrow;
+			else
+				mArrowMarker = AnalyzerResults::UpArrow;
+		}
 	}
 
 
@@ -177,6 +185,7 @@ void SpiAnalyzer::GetWord()
 	//we're assuming we come into this function with the clock in the idle state;
 
 	U32 bits_per_transfer = mSettings->mBitsPerTransfer;
+	SpiAnalyzerSettings::SampleSetting sampleSetting = mSettings->mSampleAtMiddle;
 
 	DataBuilder mosi_result;
 	U64 mosi_word = 0;
@@ -213,6 +222,11 @@ void SpiAnalyzer::GetWord()
 		if( mSettings->mDataValidEdge == AnalyzerEnums::LeadingEdge )
 		{
 			mCurrentSample = mClock->GetSampleNumber();
+			if (sampleSetting == SpiAnalyzerSettings::SAMPLE_MIDDLE)
+			{
+				U64 nextSample = mClock->GetSampleOfNextEdge();
+				mCurrentSample += (nextSample - mCurrentSample) / 2;
+			}
 			if( mMosi != NULL )
 			{
 				mMosi->AdvanceToAbsPosition( mCurrentSample );
@@ -256,6 +270,11 @@ void SpiAnalyzer::GetWord()
 		if( mSettings->mDataValidEdge == AnalyzerEnums::TrailingEdge )
 		{
 			mCurrentSample = mClock->GetSampleNumber();
+			if (sampleSetting == SpiAnalyzerSettings::SAMPLE_MIDDLE)
+			{
+				U64 nextSample = mClock->GetSampleOfNextEdge();
+				mCurrentSample += (nextSample - mCurrentSample) / 2;
+			}
 			if( mMosi != NULL )
 			{
 				mMosi->AdvanceToAbsPosition( mCurrentSample );
