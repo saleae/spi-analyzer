@@ -7,6 +7,8 @@
 class SpiAnalyzerSettings : public AnalyzerSettings
 {
 public:
+	enum SampleSetting { SAMPLE_EDGE, SAMPLE_MIDDLE };
+
 	SpiAnalyzerSettings();
 	virtual ~SpiAnalyzerSettings();
 
@@ -25,6 +27,7 @@ public:
 	BitState mClockInactiveState;
 	AnalyzerEnums::Edge mDataValidEdge;
 	BitState mEnableActiveState;
+	SampleSetting mSampleAtMiddle;
 
 
 protected:
@@ -37,6 +40,7 @@ protected:
 	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mClockInactiveStateInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mDataValidEdgeInterface;
 	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mEnableActiveStateInterface;
+	std::auto_ptr< AnalyzerSettingInterfaceNumberList > mSampleAtMiddleInterface;
 };
 
 #endif //SPI_ANALYZER_SETTINGS

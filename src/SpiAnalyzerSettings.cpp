@@ -13,7 +13,8 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mBitsPerTransfer( 8 ),
 	mClockInactiveState( BIT_LOW ),
 	mDataValidEdge( AnalyzerEnums::LeadingEdge ), 
-	mEnableActiveState( BIT_LOW )
+	mEnableActiveState( BIT_LOW ),
+	mSampleAtMiddle( SAMPLE_EDGE )
 {
 	mMosiChannelInterface.reset( new AnalyzerSettingInterfaceChannel() );
 	mMosiChannelInterface->SetTitleAndTooltip( "MOSI", "Master Out, Slave In" );
@@ -73,6 +74,12 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	mEnableActiveStateInterface->AddNumber( BIT_HIGH, "Enable line is Active High", "" );
 	mEnableActiveStateInterface->SetNumber( mEnableActiveState );
 
+	mSampleAtMiddleInterface.reset(new AnalyzerSettingInterfaceNumberList());
+	mSampleAtMiddleInterface->SetTitleAndTooltip("Sample Point", "Configure at which point the data on the SPI bus is sampled.");
+	mSampleAtMiddleInterface->AddNumber(SAMPLE_EDGE, "Clock edge", "SPI data lines are sampled at the clock edge.");
+	mSampleAtMiddleInterface->AddNumber(SAMPLE_MIDDLE, "Delayed 1/2 clock", "SPI data lines are sampled at clocking halfway point.");
+	mSampleAtMiddleInterface->SetNumber(mSampleAtMiddle);
+
 
 	AddInterface( mMosiChannelInterface.get() );
 	AddInterface( mMisoChannelInterface.get() );
@@ -83,6 +90,7 @@ SpiAnalyzerSettings::SpiAnalyzerSettings()
 	AddInterface( mClockInactiveStateInterface.get() );
 	AddInterface( mDataValidEdgeInterface.get() );
 	AddInterface( mEnableActiveStateInterface.get() );
+	AddInterface( mSampleAtMiddleInterface.get() );
 
 
 	//AddExportOption( 0, "Export as text/csv file", "text (*.txt);;csv (*.csv)" );
@@ -136,6 +144,7 @@ bool SpiAnalyzerSettings::SetSettingsFromInterfaces()
 	mClockInactiveState =	(BitState) U32( mClockInactiveStateInterface->GetNumber() );
 	mDataValidEdge =		(AnalyzerEnums::Edge)  U32( mDataValidEdgeInterface->GetNumber() );
 	mEnableActiveState =	(BitState) U32( mEnableActiveStateInterface->GetNumber() );
+	mSampleAtMiddle =       (SampleSetting) U32(mSampleAtMiddleInterface->GetNumber());
 
 	ClearChannels();
 	AddChannel( mMosiChannel, "MOSI", mMosiChannel != UNDEFINED_CHANNEL );
@@ -165,6 +174,7 @@ void SpiAnalyzerSettings::LoadSettings( const char* settings )
 	text_archive >>  *(U32*)&mClockInactiveState;
 	text_archive >>  *(U32*)&mDataValidEdge;
 	text_archive >>  *(U32*)&mEnableActiveState;
+	text_archive >>  *(U32*)&mSampleAtMiddle;
 
 	//bool success = text_archive >> mUsePackets;  //new paramater added -- do this for backwards compatibility
 	//if( success == false )
@@ -193,6 +203,7 @@ const char* SpiAnalyzerSettings::SaveSettings()
 	text_archive <<  mClockInactiveState;
 	text_archive <<  mDataValidEdge;
 	text_archive <<  mEnableActiveState;
+	text_archive <<  mSampleAtMiddle;
 
 	return SetReturnString( text_archive.GetString() );
 }
@@ -208,4 +219,5 @@ void SpiAnalyzerSettings::UpdateInterfacesFromSettings()
 	mClockInactiveStateInterface->SetNumber( mClockInactiveState );
 	mDataValidEdgeInterface->SetNumber( mDataValidEdge );
 	mEnableActiveStateInterface->SetNumber( mEnableActiveState );
+	mSampleAtMiddleInterface->SetNumber(mSampleAtMiddle);
 }
