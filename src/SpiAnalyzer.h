@@ -1,4 +1,4 @@
-#ifndef SPI_ANALYZER_H
+﻿#ifndef SPI_ANALYZER_H
 #define SPI_ANALYZER_H
 
 #include <Analyzer.h>
@@ -25,7 +25,7 @@ class SpiAnalyzer : public Analyzer2
     void AdvanceToActiveEnableEdge();
     bool IsInitialClockPolarityCorrect();
     void AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
-    bool WouldAdvancingTheClockToggleEnable();
+    bool WouldAdvancingTheClockToggleEnable( bool add_disable_frame, U64* disable_frame );
     void GetWord();
 
 #pragma warning( push )

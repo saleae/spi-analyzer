@@ -172,7 +172,7 @@ bool SpiAnalyzer::IsInitialClockPolarityCorrect()
     }
 }
 
-bool SpiAnalyzer::WouldAdvancingTheClockToggleEnable()
+bool SpiAnalyzer::WouldAdvancingTheClockToggleEnable( bool add_disable_frame, U64* disable_frame )
 {
     if( mEnable == NULL )
         return false;
@@ -183,8 +183,15 @@ bool SpiAnalyzer::WouldAdvancingTheClockToggleEnable()
     if( enable_will_toggle )
     {
         U64 enable_edge = mEnable->GetSampleOfNextEdge();
-        FrameV2 frame_v2_end_of_transaction;
-        mResults->AddFrameV2( frame_v2_end_of_transaction, "disable", enable_edge, enable_edge + 1 );
+        if( add_disable_frame )
+        {
+            FrameV2 frame_v2_end_of_transaction;
+            mResults->AddFrameV2( frame_v2_end_of_transaction, "disable", enable_edge, enable_edge + 1 );
+        }
+        else if( disable_frame != nullptr )
+        {
+            *disable_frame = enable_edge;
+        }
     }
 
     if( enable_will_toggle == false )
@@ -208,6 +215,8 @@ void SpiAnalyzer::GetWord()
 
     U64 first_sample = 0;
     bool need_reset = false;
+    U64 disable_event_sample = 0;
+
 
     mArrowLocations.clear();
     ReportProgress( mClock->GetSampleNumber() );
@@ -220,7 +229,7 @@ void SpiAnalyzer::GetWord()
         // on every single edge, we need to check that enable doesn't toggle.
         // note that we can't just advance the enable line to the next edge, becuase there may not be another edge
 
-        if( WouldAdvancingTheClockToggleEnable() == true )
+        if( WouldAdvancingTheClockToggleEnable( true, nullptr ) == true )
         {
             AdvanceToActiveEnableEdgeWithCorrectClockPolarity(); // ok, we pretty much need to reset everything and return.
             return;
@@ -253,7 +262,7 @@ void SpiAnalyzer::GetWord()
         if( ( i == ( bits_per_transfer - 1 ) ) && ( mSettings->mDataValidEdge != AnalyzerEnums::TrailingEdge ) )
         {
             // if this is the last bit, and the trailing edge doesn't represent valid data
-            if( WouldAdvancingTheClockToggleEnable() == true )
+            if( WouldAdvancingTheClockToggleEnable( false, &disable_event_sample ) == true )
             {
                 // moving to the trailing edge would cause the clock to revert to inactive.  jump out, record the frame, and them move to
                 // the next active enable edge
@@ -267,7 +276,7 @@ void SpiAnalyzer::GetWord()
         }
 
         // this isn't the very last bit, etc, so proceed as normal
-        if( WouldAdvancingTheClockToggleEnable() == true )
+        if( WouldAdvancingTheClockToggleEnable( true, nullptr ) == true )
         {
             AdvanceToActiveEnableEdgeWithCorrectClockPolarity(); // ok, we pretty much need to reset everything and return.
             return;
@@ -324,7 +333,11 @@ void SpiAnalyzer::GetWord()
     mResults->CommitResults();
 
     if( need_reset == true )
+    {
+        FrameV2 frame_v2_end_of_transaction;
+        mResults->AddFrameV2( frame_v2_end_of_transaction, "disable", disable_event_sample, disable_event_sample + 1 );
         AdvanceToActiveEnableEdgeWithCorrectClockPolarity();
+    }
 }
 
 bool SpiAnalyzer::NeedsRerun()
