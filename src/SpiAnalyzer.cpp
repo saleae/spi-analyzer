@@ -177,12 +177,7 @@ bool SpiAnalyzer::WouldAdvancingTheClockToggleEnable( bool add_disable_frame, U6
     if( mEnable == NULL )
         return false;
 
-    U64 next_edge = mClock->GetSampleOfNextEdge();
-    bool enable_will_toggle = mEnable->WouldAdvancingToAbsPositionCauseTransition( next_edge );
-
-    if( enable_will_toggle )
-    {
-        U64 enable_edge = mEnable->GetSampleOfNextEdge();
+    auto log_disable_event = [&]( U64 enable_edge ) {
         if( add_disable_frame )
         {
             FrameV2 frame_v2_end_of_transaction;
@@ -192,6 +187,32 @@ bool SpiAnalyzer::WouldAdvancingTheClockToggleEnable( bool add_disable_frame, U6
         {
             *disable_frame = enable_edge;
         }
+    };
+
+    // if the enable is currently active, and there are no more clock transitions in the capture, attempt to capture the final disable event
+    if( !mClock->DoMoreTransitionsExistInCurrentData() && mEnable->GetBitState() == mSettings->mEnableActiveState )
+    {
+        if( mEnable->DoMoreTransitionsExistInCurrentData() )
+        {
+            U64 next_enable_edge = mEnable->GetSampleOfNextEdge();
+            // double check that the clock line actually processed all samples up to the next enable edge.
+            // double check is required becase data is getting processed while we're running, it's possible more has already become
+            // available.
+            if( !mClock->WouldAdvancingToAbsPositionCauseTransition( next_enable_edge ) )
+            {
+                log_disable_event( next_enable_edge );
+                return true;
+            }
+        }
+    }
+
+    U64 next_edge = mClock->GetSampleOfNextEdge();
+    bool enable_will_toggle = mEnable->WouldAdvancingToAbsPositionCauseTransition( next_edge );
+
+    if( enable_will_toggle )
+    {
+        U64 enable_edge = mEnable->GetSampleOfNextEdge();
+        log_disable_event( enable_edge );
     }
 
     if( enable_will_toggle == false )
