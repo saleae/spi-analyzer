@@ -17,6 +17,7 @@ SpiAnalyzer::SpiAnalyzer()
       mEnable( NULL )
 {
     SetAnalyzerSettings( mSettings.get() );
+    UseFrameV2();
 }
 
 SpiAnalyzer::~SpiAnalyzer()
