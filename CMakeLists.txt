@@ -22,6 +22,8 @@ src/SpiAnalyzerSettings.cpp
 src/SpiAnalyzerSettings.h
 src/SpiSimulationDataGenerator.cpp
 src/SpiSimulationDataGenerator.h
+src/EspiDecoder.cpp
+src/EspiDecoder.h
 )
 
 add_analyzer_plugin(spi_analyzer SOURCES ${SOURCES})
